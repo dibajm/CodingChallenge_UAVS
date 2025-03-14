@@ -16,15 +16,22 @@ class Program
 {
     static void Main()
     {
-        string csvFilePath = "SensorData1.csv";
-        string jsonFilePath = "SensorData2.json"; 
-        string outputFilePath = "MatchedSensorOutput.json";
+        //read the csv anf json files for data
+        Console.WriteLine(Directory.GetCurrentDirectory());
+        string csvFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SensorData1.csv");
+        string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SensorData2.json");
         
+        //output file to store the matched data
+        string outputFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MatchedSensorOutput.json");
+        
+        //load the data from files into arrays
         List<SensorData> sensor1Data = LoadCsv(csvFilePath);
         List<SensorData> sensor2Data = LoadJson(jsonFilePath);
         
+        //match data in both arrays
         Dictionary<int, int> matches = MatchSensors(sensor1Data, sensor2Data);
         
+        //write into the output file to store the matched data points
         File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(matches, Formatting.Indented));
         Console.WriteLine("Matching complete. Results saved to " + outputFilePath);
     }
@@ -32,7 +39,7 @@ class Program
     static List<SensorData> LoadCsv(string filePath)
     {
         List<SensorData> data = new List<SensorData>();
-        foreach (var line in File.ReadLines(filePath).Skip(1)) // Skip header
+        foreach (var line in File.ReadLines(filePath).Skip(1)) 
         {
             var values = line.Split(',');
             double lat, lon;
@@ -68,7 +75,7 @@ class Program
                 if (GetDistance(s1.Latitude, s1.Longitude, s2.Latitude, s2.Longitude) <= 100)
                 {
                     matches[s1.Id] = s2.Id;
-                    break; // Stop after first match
+                    break; 
                 }
             }
         }
@@ -77,7 +84,7 @@ class Program
 
     static double GetDistance(double lat1, double lon1, double lat2, double lon2)
     {
-        const double R = 6371000; // Earth's radius in meters
+        const double R = 6371000; 
         double dLat = ToRadians(lat2 - lat1);
         double dLon = ToRadians(lon2 - lon1);
         double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
